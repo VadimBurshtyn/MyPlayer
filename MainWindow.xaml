@@ -1,0 +1,64 @@
+﻿<Window x:Class="MyPlayer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="120" 
+        Drop="Tracks_Drop" AllowDrop="True" 
+        Opacity="0.3"  AllowsTransparency="True" WindowStyle="None"
+        Background="{x:Null}" Foreground="{x:Null}" Name="MainPanel">
+    <Window.Resources>
+        <BitmapImage x:Key="play" UriSource="Images/Play.png" />
+        <BitmapImage x:Key="pause" UriSource="Images/Pause.png" />
+        <BitmapImage x:Key="repeat" UriSource="Images/Repeat.png" />
+        <BitmapImage x:Key="img" UriSource="Images/Default.png" />
+    </Window.Resources>
+
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Window.MouseLeave">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="(Height)"  From="120" To="20" Duration="0:0:2" BeginTime="0:0:5"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(Opacity)" From="0.8" To="0.01" Duration="0:0:2" BeginTime="0:0:5"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(Top)" From="{DynamicResource height}" To="{DynamicResource minheight}" Duration="0:0:2" BeginTime="0:0:5"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+
+        <EventTrigger RoutedEvent="Window.MouseEnter">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="(Height)"  From="20" To="120" Duration="0:0:0" />
+                    <DoubleAnimation Storyboard.TargetProperty="(Opacity)" From="0.01" To="0.8" Duration="0:0:0"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(Top)" From="{DynamicResource minheight}" To="{DynamicResource height}" Duration="0:0:0"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+        <EventTrigger RoutedEvent="Window.DragOver">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="(Height)"  From="20" To="120" Duration="0:0:0" />
+                    <DoubleAnimation Storyboard.TargetProperty="(Opacity)" From="0.01" To="0.8" Duration="0:0:0"/>
+                    <DoubleAnimation Storyboard.TargetProperty="(Top)" From="{DynamicResource minheight}" To="{DynamicResource height}" Duration="0:0:0"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
+
+    <StackPanel Orientation="Horizontal">
+        <StackPanel Orientation ="Vertical" Width="40">
+            <Button MouseEnter="ControlMouseEnter" MouseLeave="ControlMouseLeave">
+                <Image Source="{DynamicResource play}"></Image>
+            </Button>
+            <Button MouseEnter="ControlMouseEnter" MouseLeave="ControlMouseLeave">
+                <Image Source="{DynamicResource pause}"></Image>
+            </Button>
+            <Button MouseEnter="ControlMouseEnter" MouseLeave="ControlMouseLeave">
+                <Image Source="{DynamicResource repeat}"></Image>
+            </Button>
+        </StackPanel>       
+            <StackPanel  Orientation="Horizontal" Background="LightGray"  Name="Tracks" Height="120">
+              
+            </StackPanel>
+
+
+    </StackPanel>
+</Window>

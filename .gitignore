@@ -1,6 +1,22 @@
+<<<<<<< HEAD
 # git ignore file
 /obj
 *.dll
 *.pdb
 *.tlog
 *.cache
+=======
+# http://www.gnu.org/software/automake
+
+Makefile.in
+
+# http://www.gnu.org/software/autoconf
+
+/autom4te.cache
+/aclocal.m4
+/compile
+/configure
+/depcomp
+/install-sh
+/missing
+>>>>>>> ca1318be04b07105678cefcc0903d79f1cb98acc

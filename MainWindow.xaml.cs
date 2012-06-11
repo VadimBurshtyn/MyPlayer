@@ -23,9 +23,10 @@ namespace MyPlayer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Timer timer;
+        private DispatcherTimer timer;
         Player player = new Player();
-        private ImageButton current;
+        private Track current = new Track();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -33,7 +34,10 @@ namespace MyPlayer
             Top = SystemParameters.PrimaryScreenHeight - MainPanel.Height - 30;
             MainPanel.Width = SystemParameters.PrimaryScreenWidth;
             Tracks.Width = SystemParameters.PrimaryScreenWidth - 40;
-            timer = new Timer(TimerTick);
+            
+            timer = new DispatcherTimer(/*new TimeSpan(0,0,1),DispatcherPriority.Normal,TimerTick, timer.Dispatcher*/);
+            timer.Tick += new EventHandler(TimerTick);
+            timer.Interval = new TimeSpan(0, 0, 1); 
             //ShowInTaskbar = false;
             Resources.Add("height", SystemParameters.PrimaryScreenHeight - MainPanel.Height - 30);
             Resources.Add("minheight", SystemParameters.PrimaryScreenHeight - 45);
@@ -42,6 +46,10 @@ namespace MyPlayer
         private void Tracks_Drop(object sender, DragEventArgs e)
         {
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (files == null)
+            {
+                files = ((string)e.Data.GetData(DataFormats.UnicodeText)).Split(';');
+            }
             AddTracks(files);
         }
 
@@ -49,34 +57,38 @@ namespace MyPlayer
         {
             foreach (string file in files)
             {
-                ImageButton button = new ImageButton() { Content = new Image() { Source = (ImageSource)Resources["img"] }, TrackPath = file };
+                Track button = new Track() { Background = new ImageBrush() { ImageSource = ((Image)Resources["img"]).Source }, TrackPath = file};
                 button.MouseDoubleClick += (MouseButtonEventHandler)PlayTrack;
+                button.MouseDoubleClick += (MouseButtonEventHandler)Button_MouseDown;
                 Tracks.Children.Add(button);
             }
         }
-
-        private void ControlMouseEnter(object sender, MouseEventArgs e)
-        {
-            Button button = (Button)sender;
-            button.Opacity = 1;
-        }
-
-        private void ControlMouseLeave(object sender, MouseEventArgs e)
-        {
-            Button button = (Button)sender;
-            button.Opacity += 0.3;
-        }
+        
         private void PlayTrack(object sender, MouseEventArgs e)
         {
-            ImageButton button = (ImageButton) sender;
-            current = button;
-            button.Bar = new ProgressBar();
-            player.Play(button.TrackPath);
+            
+            Track button = (Track) sender;
+            if(current == button)
+            {
+                player.Continue();
+            }
+            else
+            {
+                current.Value = 0;
+                button.Maximum = player.Play(button.TrackPath) - 2;
+                current = button;
+            }
+            
         }
 
-        private void TimerTick(object sender)
+        private void TimerTick(object sender, EventArgs e)
         {
-            current.Bar.Value += 1;
+            current.Value += 1;
+            if (current.Value >= current.Maximum)
+                PlayTrack(
+                    Tracks.Children.IndexOf(current) == Tracks.Children.Count - 1
+                        ? Tracks.Children[0]
+                        : Tracks.Children[Tracks.Children.IndexOf(current) + 1], (MouseButtonEventArgs) null);
         }
 
         private void Pan_MouseUp(object sender, MouseButtonEventArgs e)
@@ -86,6 +98,18 @@ namespace MyPlayer
             dialog.Multiselect = true;
             dialog.ShowDialog();
             AddTracks(dialog.FileNames);
+        }
+
+        private void Button_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            timer.Start();
+        }
+
+        private void Pause(object sender, MouseButtonEventArgs e)
+        {
+            player.Pause();
+            timer.Stop();
+            base.OnMouseUp(e);
         }
     }
 }

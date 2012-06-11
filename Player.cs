@@ -22,29 +22,41 @@ namespace MyPlayer
             }
         }
 
-        public void Play(string path)
+        public double Play(string path)
         {
             try
             {
                 Bass.BASS_StreamFree(stream);
                 stream = Bass.BASS_StreamCreateFile(path, 0L, 0L, BASSFlag.BASS_DEFAULT);
                 Bass.BASS_ChannelPlay(stream, false);
-/*
-//                 BASSError be = Bass.BASS_ErrorGetCode();
-//                 Bass.BASS_StreamFree(stream);
-//                 Bass.BASS_Free();
-*/
-
+                //BASSError be = Bass.BASS_ErrorGetCode();
+           
             }
             catch (Exception e)
             {
                 throw;
             }
+            return Bass.BASS_ChannelBytes2Seconds(stream, Bass.BASS_ChannelGetLength(stream));
         }
 
         public void Pause()
         {
             Bass.BASS_Pause();
+        }
+
+        public bool IsPlaying()
+        {
+            BASSActive status = Bass.BASS_ChannelIsActive(stream);
+            if (status == BASSActive.BASS_ACTIVE_PLAYING)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public void Continue()
+        {
+            Bass.BASS_Start();
         }
     }
 }
